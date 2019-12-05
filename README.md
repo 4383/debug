@@ -6,7 +6,7 @@ This website host a bunch of usual things, tips and tricks that I use daily.
 
 ### Resources
 
-#### RabbitMQ
+#### [RabbitMQ](sections/rabbitmq.md)
 
 How to debug RabbitMQ
 
