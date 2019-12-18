@@ -83,6 +83,73 @@ Client consuming a messages:
     |                                        |
 ```
 
+### RabbitMQ Ports
+
+This section define classic ports in use in a traditional way and in
+a clustering way (HA).
+
+For a cluster of nodes, they must be open to each other on 35197,
+4369 and 5672.
+
+See [networking guide](https://www.rabbitmq.com/networking.html#ports)
+for more details.
+
+#### Port 4369
+
+RabbitMQ use the port 4369 for discovery (
+[Erlang Port Mapper Daemon (epmd)](http://erlang.org/doc/man/epmd.html)).
+Discovery mean resolution of node names in a cluster. Nodes must be able
+to reach each other and the port mapper daemon for clustering to work.
+
+#### Port 35197
+
+The port 35197 is used to run distribued Erlang through a firewall.
+
+Don't forget that RabbitMQ is wrote in Erlang.
+
+Port 35197 set by `inet_dist_listen_min/max` firewalls must permit traffic
+in this range to pass between clustered nodes.
+
+#### Port 5672
+
+RabbitMQ nodes and server talk to clients via the port 5672 (default port).
+
+For any servers that want to use the message queue, only 5672 is required.
+
+#### Port 25672
+
+RabbitMQ nodes talk to each other over the port 25672 (clustering port)
+
+Used for inter-node and CLI tools communication
+(Erlang distribution server port) and is allocated from a dynamic range
+(limited to a single port by default, computed as AMQP port + 20000).
+Unless external connections on these ports are really necessary
+(e.g. the cluster uses federation or CLI tools are used on machines
+outside the subnet), these ports should not be publicly exposed.
+
+#### Port 15672 & 55672
+
+These ports (15672 and 55672) are used by the management console.
+
+- Port 15672 for RabbitMQ version 3.x
+- Port 55672 for RabbitMQ pre 3.x
+
+#### Which ports to debug
+
+Depends on your context, if you try to debug a client server communcation
+like `oslo.messaging` and RabbitMQ cluter in openstack, then you only need
+to capture the port `5672`. See the `tcpdump` section below for detailed
+example.
+
+If you try to debug some synchronization or
+[mirroring](https://www.rabbitmq.com/ha.html) between your cluster nodes then
+it can be useful to capture the traffic on ports `25672`, `4369`, and `35197`.
+This traffic analyze can help you to understand if which packets transit
+between your nodes and why your error happen.
+
+See the [clustering guide](https://www.rabbitmq.com/clustering.html)
+for more informations.
+
 ### Wireshark
 
 All the below resources are related to AMQP version 0.9
