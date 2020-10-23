@@ -14,6 +14,6 @@ How to debug RabbitMQ
 
 How to debug RabbitMQ
 
-#### Openstack
+#### [Openstack](sections/openstack/README.md)
 
 How to debug on Openstack
