@@ -259,3 +259,4 @@ default_log_levels=kombu=DEBUG,oslo.messaging=DEBUG,py-amqp=DEBUG"
 
 - [AMQP 0.9.1 specifications](https://www.rabbitmq.com/resources/specs/amqp0-9-1.pdf)
 - [A look into AMQP's frame structure](https://www.brianstorti.com/speaking-rabbit-amqps-frame-structure/)
+- [Troubleshooting common oslo.messaging/rabbitmq issues](https://www.slideshare.net/michaelklishin/troubleshooting-common-oslomessaging-and-rabbitmq-issues)
