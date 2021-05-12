@@ -247,6 +247,14 @@ Allow AMQP traffic:
 $ sudo iptables -D INPUT 1
 ```
 
+### Activate debug mode on openstack/oslo
+
+```
+[DEFAULT]
+debug=true
+default_log_levels=kombu=DEBUG,oslo.messaging=DEBUG,py-amqp=DEBUG"
+```
+
 ### Links
 
 - [AMQP 0.9.1 specifications](https://www.rabbitmq.com/resources/specs/amqp0-9-1.pdf)
