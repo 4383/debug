@@ -247,12 +247,39 @@ Allow AMQP traffic:
 $ sudo iptables -D INPUT 1
 ```
 
-### Activate debug mode on openstack/oslo
+### Activate debug mode on openstack/oslo.messaging
 
 ```
 [DEFAULT]
 debug=true
 default_log_levels=kombu=DEBUG,oslo.messaging=DEBUG,py-amqp=DEBUG"
+```
+
+### Runs oslo.messaging' simulator tools
+
+Start a rabbitmq server:
+
+```
+podman run -d -e RABBITMQ_NODENAME=rabbitmq \
+    -p 5672:5672 \
+    -p 15672:15672 \
+    --name rabbitmq \
+    rabbitmq:3-management
+```
+
+The management dashboard is accessible by browsing
+[http://127.0.0.1:15672](http://127.0.0.1:15672).
+
+Then now run the simulator by starting the rpc server:
+
+```
+tox -e venv -- python ./tools/simulator.py --url rabbit://localhost/ rpc-server
+```
+
+Now start the rpc-client:
+
+```
+tox -e venv -- python ./tools/simulator.py --url rabbit://localhost/ rpc-client
 ```
 
 ### Links
