@@ -4,7 +4,7 @@
 
 You can run Eventlet's all its unit tests by using tox:
 
-```
+```shell
 $ tox
 ```
 
@@ -12,7 +12,7 @@ The previous command will run unit tests with all the Eventlet hubs.
 
 You can select a specific Eventlet hub (described in sections below) by using:
 
-```
+```shell
 $ tox -e py312-asyncio
 ```
 
@@ -86,7 +86,7 @@ The `$!` parameter allow you to retrieve the process ID (pid) of the most recent
 
 Running the previous command generated something like the following output:
 
-```
+```strace
 accept4(15, 0x7ffe3e4855b0, [16], SOCK_CLOEXEC) = -1 EAGAIN (Resource temporarily unavailable)
 fstat(15, {st_mode=S_IFSOCK|0777, st_size=0, ...}) = 0
 epoll_ctl(11, EPOLL_CTL_ADD, 15, {EPOLLIN, {u32=15, u64=15}}) = 0
@@ -133,7 +133,7 @@ To avoid unexpected pid creation I'd suggest to use a container to run your unit
 
 Profiling a specific unit test (`test_001_server`) from the wsgi test module:
 
-```
+```shell
 $ export EVENTLET_HUB=asyncio; \
 .tox/py312-asyncio/bin/python -m cProfile -o profiling.cprof \
 .tox/py312-asyncio/bin/py.test \
@@ -142,7 +142,7 @@ tests/wsgi_test.py::TestHttpd::test_001_server
 
 You can even profile and `strace` this test at the same time:
 
-```
+```shell
 $ export EVENTLET_HUB=asyncio; \
 .tox/py312-asyncio/bin/python -m cProfile -o profiling.cprof \
 .tox/py312-asyncio/bin/py.test \
@@ -154,7 +154,7 @@ Once done, you can use [pyprof2calltree](https://pypi.org/project/pyprof2calltre
 command to convert your profiling data into a format that can be opened with
 [KCacheGrind](https://kcachegrind.github.io/html/Home.html). Example:
 
-```
+```shell
 $ export EVENTLET_HUB=asyncio; \
 .tox/py312-asyncio/bin/python -m cProfile -o profiling.cprof \
 .tox/py312-asyncio/bin/py.test \
