@@ -94,6 +94,8 @@ strace -p $!
 $ pyprof2calltree -k -i profiling.cprof
 ```
 
+The previous last command opened KCacheGrind with our data:
+
 ![KCacheGrind of eventlet unit test](kcachegrind-eventlet.png "KCacheGrind of eventlet unit test")
 
 
