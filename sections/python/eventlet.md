@@ -39,7 +39,8 @@ $ .tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd
 Run an individual test belonging to a specific [unit test case](https://docs.python.org/3/library/unittest.html#unittest.TestCase) of the wsgi test module:
 
 ```shell
-$ .tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd::test_close_idle_connections_listen_socket_closed
+$ .tox/py312-asyncio/bin/py.test \
+tests/wsgi_test.py::TestHttpd::test_close_idle_connections_listen_socket_closed
 ```
 
 ### Switch between hubs
@@ -51,13 +52,15 @@ Eventlet provide multiple hub implementations. The goal here is to see how to sw
 Using Eventlet's [asyncio hub](https://eventlet.readthedocs.io/en/latest/migration.html#step-1-switch-to-the-asyncio-hub):
 
 ```shell
-$ export EVENTLET_HUB=asyncio; .tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd
+$ export EVENTLET_HUB=asyncio; \
+.tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd
 ```
 
 Using Eventlet's epoll hub:
 
 ```shell
-$ export EVENTLET_HUB=epoll; .tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd
+$ export EVENTLET_HUB=epoll; \
+.tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd
 ```
 
 ### Strace Unit Tests
