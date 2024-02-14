@@ -1,23 +1,45 @@
 ## Eventlet debug resources
 
+### Use tox as virtual env
+
+You can run Eventlet's all its unit tests by using tox:
+
+```
+$ tox
+```
+
+The previous command will run unit tests with all the Eventlet hubs.
+
+You can select a specific Eventlet hub (described in sections below) by using:
+
+```
+$ tox -e py312-asyncio
+```
+
+The previous command create `.tox/py312-asyncio/bin` directory that you
+can access manually to trigger things in a more fine grained way.
+
 ### Run a Specific Unit Test Case
+
+The following commands requires setup a tox environment first. See the
+previous section.
 
 Run all the tests of the wsgi test module:
 
 ```shell
-.tox/py312-asyncio/bin/py.test tests/wsgi_test.py
+$ .tox/py312-asyncio/bin/py.test tests/wsgi_test.py
 ```
 
 Run a specific [unit test case](https://docs.python.org/3/library/unittest.html#unittest.TestCase) of the wsgi test module:
 
 ```shell
-.tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd
+$ .tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd
 ```
 
 Run an individual test belonging to a specific [unit test case](https://docs.python.org/3/library/unittest.html#unittest.TestCase) of the wsgi test module:
 
 ```shell
-.tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd::test_close_idle_connections_listen_socket_closed
+$ .tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd::test_close_idle_connections_listen_socket_closed
 ```
 
 ### Switch between hubs
@@ -29,13 +51,13 @@ Eventlet provide multiple hub implementations. The goal here is to see how to sw
 Using Eventlet's [asyncio hub](https://eventlet.readthedocs.io/en/latest/migration.html#step-1-switch-to-the-asyncio-hub):
 
 ```shell
-export EVENTLET_HUB=asyncio; .tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd
+$ export EVENTLET_HUB=asyncio; .tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd
 ```
 
 Using Eventlet's epoll hub:
 
 ```shell
-export EVENTLET_HUB=epoll; .tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd
+$ export EVENTLET_HUB=epoll; .tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd
 ```
 
 ### Strace Unit Tests
@@ -51,7 +73,7 @@ During your debug session you may want to `strace` your unit tests or a specific
 Strace a specific unit test from the [wsgi test module](https://github.com/eventlet/eventlet/blob/master/tests/wsgi_test.py):
 
 ```shell
-.tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd::test_001_server & strace -p $!
+$ .tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd::test_001_server & strace -p $!
 ```
 
 The `$!` parameter allow you to retrieve the process ID (pid) of the most recently executed process. As we put the execution of your unit test in background, the strace command should normally retrieve the pid of your unit test.
