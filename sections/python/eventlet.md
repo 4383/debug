@@ -167,6 +167,24 @@ The previous last command opened KCacheGrind with our data:
 
 ![KCacheGrind of eventlet unit test](kcachegrind-eventlet.png "KCacheGrind of eventlet unit test")
 
+## Check a new underlying library version upgrade
+
+Eventlet wrap a couple of underlying libraries, like [dnspython](https://pypi.org/project/dnspython).
+Sometime a new version of these libraries come with a new API that need
+to be reflected on the Eventlet side. Here is a [concrete example](https://github.com/eventlet/eventlet/pull/916).
+In this example dnspython just came with a new release candidate that won't
+be pulled by pip, the following example show you how to check that there is
+no regressions between the current stable version and the coming release
+candidate version:
+
+```shell
+$ # force recreating a new tox env from scratch:
+$ tox -r -e py312 # ok with version 2.5.0 (the default pulled version)
+$ # upgrade to the release candidate version:
+$ .tox/py312/bin/pip install --force-reinstall -v dnspython==2.6.0rc1
+$ # reusing this updated tox env:
+$ tox -e py312 # ok with the newer version 2.6.0rc1
+```
 
 ### Links
 
