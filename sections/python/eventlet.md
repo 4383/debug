@@ -60,6 +60,43 @@ To avoid unexpected pid creation I'd suggest to use a container to run your unit
 
 [![asciicast](https://asciinema.org/a/0e7cLRsHiNJlBQdlIgdkApAsU.svg)](https://asciinema.org/a/0e7cLRsHiNJlBQdlIgdkApAsU)
 
+### Profile Unit Tests
+
+Profiling a specific unit test (`test_001_server`) from the wsgi test module:
+
+```
+$ export EVENTLET_HUB=asyncio; \
+.tox/py312-asyncio/bin/python -m cProfile -o profiling.cprof \
+.tox/py312-asyncio/bin/py.test \
+tests/wsgi_test.py::TestHttpd::test_001_server
+```
+
+You can even profile and `strace` this test at the same time:
+
+```
+$ export EVENTLET_HUB=asyncio; \
+.tox/py312-asyncio/bin/python -m cProfile -o profiling.cprof \
+.tox/py312-asyncio/bin/py.test \
+tests/wsgi_test.py::TestHttpd::test_001_server & \
+strace -p $!
+```
+
+Once done, you can use [pyprof2calltree](https://pypi.org/project/pyprof2calltree/)
+command to convert your profiling data into a format that can be opened with
+[KCacheGrind](https://kcachegrind.github.io/html/Home.html). Example:
+
+```
+$ export EVENTLET_HUB=asyncio; \
+.tox/py312-asyncio/bin/python -m cProfile -o profiling.cprof \
+.tox/py312-asyncio/bin/py.test \
+tests/wsgi_test.py::TestHttpd::test_001_server & \
+strace -p $!
+$ pyprof2calltree -k -i profiling.cprof
+```
+
+![KCacheGrind of eventlet unit test]({{ site.static_files }}/kcachegrind-eventlet.png "KCacheGrind of eventlet unit test")
+
+
 ### Links
 
 - [Eventlet Documentation](https://eventlet.readthedocs.io/)
