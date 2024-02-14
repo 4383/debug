@@ -56,7 +56,7 @@ Strace a specific unit test from the [wsgi test module](https://github.com/event
 
 The `$!` parameter allow you to retrieve the process ID (pid) of the most recently executed process. As we put the execution of your unit test in background, the strace command should normally retrieve the pid of your unit test.
 
-To avoid unexpected pid creation I'd suggest to use a container to run your unit tests and to isolate your process in an environment with a lowest activity. You can use my [machine project](https://github.com/4383/machine) to setup this isolated environment. Here below a demo of this kind of environment.
+To avoid unexpected pid creation I'd suggest to use a container to run your unit tests and to isolate your process in an environment with a lowest activity. You can use my [machine project](https://github.com/4383/machine) to setup this isolated environment. Here below is a demo of this kind of environment.
 
 [![asciicast](https://asciinema.org/a/0e7cLRsHiNJlBQdlIgdkApAsU.svg)](https://asciinema.org/a/0e7cLRsHiNJlBQdlIgdkApAsU)
 
