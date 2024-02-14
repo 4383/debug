@@ -167,7 +167,7 @@ The previous last command opened KCacheGrind with our data:
 
 ![KCacheGrind of eventlet unit test](kcachegrind-eventlet.png "KCacheGrind of eventlet unit test")
 
-## Check a new underlying library version upgrade
+### Check a new underlying library version upgrade
 
 Eventlet wrap a couple of underlying libraries, like [dnspython](https://pypi.org/project/dnspython).
 Sometime a new version of these libraries come with a new API that need
