@@ -94,7 +94,7 @@ strace -p $!
 $ pyprof2calltree -k -i profiling.cprof
 ```
 
-![KCacheGrind of eventlet unit test]({{ site.static_files }}/kcachegrind-eventlet.png "KCacheGrind of eventlet unit test")
+![KCacheGrind of eventlet unit test](kcachegrind-eventlet.png "KCacheGrind of eventlet unit test")
 
 
 ### Links
