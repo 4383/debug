@@ -38,7 +38,7 @@ Using Eventlet's epoll hub:
 export EVENTLET_HUB=epoll; .tox/py312-asyncio/bin/py.test tests/wsgi_test.py::TestHttpd
 ```
 
-## Strace Unit Tests
+### Strace Unit Tests
 
 [strace](https://strace.io/) is a diagnostic, debugging and
 instructional userspace utility for Linux. It is used to monitor
