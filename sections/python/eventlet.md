@@ -68,6 +68,4 @@ To avoid unexpected pid creation I'd suggest to use a container to run your unit
 
 ### Links
 
-- [AMQP 0.9.1 specifications](https://www.rabbitmq.com/resources/specs/amqp0-9-1.pdf)
-- [A look into AMQP's frame structure](https://www.brianstorti.com/speaking-rabbit-amqps-frame-structure/)
-- [Troubleshooting common oslo.messaging/rabbitmq issues](https://www.slideshare.net/michaelklishin/troubleshooting-common-oslomessaging-and-rabbitmq-issues)
+- [Eventlet Documentation](https://eventlet.readthedocs.io/)
