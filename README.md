@@ -1,8 +1,8 @@
 ## Welcome to debug
 
-Debug is a website dedicated to store and share specific tips about debuging.
+Debug is a website dedicated to store and share debugging tips.
 
-This website host a bunch of usual things, tips and tricks that I use daily.
+This website present tips and tricks that I use on a daily basis.
 
 ### Resources
 
@@ -10,9 +10,9 @@ This website host a bunch of usual things, tips and tricks that I use daily.
 
 How to debug RabbitMQ
 
-#### Python
+#### [Python](sections/python/README.md)
 
-How to debug RabbitMQ
+- [Debug eventlet](sections/python/eventlet.md)
 
 #### [Openstack](sections/openstack/README.md)
 
