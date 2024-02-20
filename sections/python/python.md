@@ -1,12 +1,28 @@
 ## Python Debug Resources
 
+In the following examples I refer to one of my code snippets
+named [atomic.py](https://github.com/4383/snippets/blob/main/python/atomic.py).
+
+I also use my [preconfigured environment](https://github.com/4383/machine),
+with all the apps and commands used already installed.
+
+Do not hesistate to checkout my boths repos to test the following commands.
+
+### Using GDB with python
+
+Using GDB can avoid to edit your code to append debug points.
+
+In the following command, I first ran my script, and then I directly attach
+gdb to the pid corresponding to my running python script:
+
+```
+python python/atomic.py & gdb python $!
+```
+
 ### Compile Python Code
 
 Sometime it could be useful to compile python.
 To do that you can simply use the [pyinstaller library](https://pyinstaller.org/en/stable/).
-
-In the following example I compile the code of one
-of my code snippets name [atomic.py](https://github.dev/4383/snippets/blob/main/python/atomic.py)
 
 Compiling the code of `atomic.py`:
 
