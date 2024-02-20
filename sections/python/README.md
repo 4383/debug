@@ -1,3 +1,4 @@
-# Python
+## Python
 
-[Debug eventlet](sections/python/eventlet.md)
+- [How to Debug Python](python.html)
+- [How to Debug Eventlet](eventlet.html)
