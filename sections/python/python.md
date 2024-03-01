@@ -88,7 +88,7 @@ dist
 3 directories, 44 files
 ```
 
-## Disassemble Compiled Python Code
+### Disassemble Compiled Python Code
 
 Compiling and disassembling python code can allow you to implement
 some sort of linters, like one that could be used to identify
