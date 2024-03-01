@@ -25,19 +25,19 @@ python python/atomic.py & gdb python $!
 
 You can simply retrieve this exception by using:
 
-```
+```python
 (pdb) __exception__
 ```
 
 You can print the exception part of a traceback in pdb with:
 
-```
+```python
 (Pdb) import traceback; print "".join(traceback.format_exception_only(*__exception__))
 ```
 
 This trick is useful when you deal with code like the following snippet:
 
-```
+```python
 try:
     do_something()
 except:
