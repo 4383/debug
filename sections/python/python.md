@@ -19,6 +19,31 @@ gdb to the pid corresponding to my running python script:
 python python/atomic.py & gdb python $!
 ```
 
+### Retrieve the Current Exception in PDB
+
+`pdb` stores the exception type and value in `__exception__`.
+
+You can simply retrieve this exception by using:
+
+```
+(pdb) __exception__
+```
+
+You can print the exception part of a traceback in pdb with:
+
+```
+(Pdb) import traceback; print "".join(traceback.format_exception_only(*__exception__))
+```
+
+This trick is useful when you deal with code like the following snippet:
+
+```
+try:
+    do_something()
+except:
+    do_something_else()
+```
+
 ### Compile Python Code
 
 Sometime it could be useful to compile python.
