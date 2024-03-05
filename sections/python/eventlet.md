@@ -43,6 +43,12 @@ $ .tox/py312-asyncio/bin/py.test \
 tests/wsgi_test.py::TestHttpd::test_close_idle_connections_listen_socket_closed
 ```
 
+### Trigger PDB when a test is failing
+
+```shell
+$ .tox/py312-asyncio/bin/py.test --pdb tests/asyncio_test.py
+```
+
 ### Switch between hubs
 
 Eventlet provide [various hubs](https://eventlet.readthedocs.io/en/latest/hubs.html). Hubs are designed to dispatches I/O events and schedules greenthreads.
@@ -202,6 +208,36 @@ This pcap file can be opened and viewed by using wireshark. Wireshark's
 rendering will be more user friendly.
 
 ![Eventlet pcap file loaded in Wireshark](wireshark.png "Eventlet pcap file loaded in Wireshark")
+
+### Get All Asyncio Tasks Within PDB
+
+Consider the following test as a failing test who will trigger a PDB post
+mortem analysis:
+
+```
+$ .tox/py312-asyncio/bin/py.test --pdb tests/asyncio_test.py
+...
+eventlet/asyncio.py:56: in _run
+return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+>   async def go():
+E   asyncio.exceptions.CancelledError
+
+tests/asyncio_test.py:235: CancelledError
+>>>>>>>>>>>>>>>>> entering PDB >>>>>>>>>>>>>>>>>>>
+
+>>>>>>>>>>>>>>>>> PDB post_mortem (IO-capturing turned off) >>>>>>>>>>>>>>>
+> /home/dev/app/tests/asyncio_test.py(235)go()
+-> async def go():
+(Pdb) import asyncio
+(Pdb) tasks = asyncio.all_tasks()
+(Pdb) pp tasks
+{<Task pending name='Task-1' coro=<Hub.run.<locals>.async_run() running at /home/dev/app/eventlet/hubs/asyncio.py:141> cb=[_run_until_complete_cb() at /usr/local/lib/python3.12/asyncio/base_events.py:181] created at /usr/local/lib/python3.12/asyncio/tasks.py:695>}
+```
+
+In the previous example we imported `asyncio` and then we retrieved
+all the tasks of the current event loop.
 
 ### Links
 
