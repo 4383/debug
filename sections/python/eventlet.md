@@ -239,6 +239,32 @@ tests/asyncio_test.py:235: CancelledError
 In the previous example we imported `asyncio` and then we retrieved
 all the tasks of the current event loop.
 
+### Retrieve All the Active Threads From PDB
+
+```
+$ .tox/py312-asyncio/bin/py.test --pdb tests/asyncio_test.py
+...
+eventlet/asyncio.py:56: in _run
+return future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+>   async def go():
+E   asyncio.exceptions.CancelledError
+
+tests/asyncio_test.py:235: CancelledError
+>>>>>>>>>>>>>>>>> entering PDB >>>>>>>>>>>>>>>>>>>
+
+>>>>>>>>>>>>>>>>> PDB post_mortem (IO-capturing turned off) >>>>>>>>>>>>>>>
+> /home/dev/app/tests/asyncio_test.py(235)go()
+-> async def go():
+(Pdb) import threading
+(Pdb) threading._active
+{140007515125568: <_MainThread(MainThread, started 140007515125568)>}
+```
+
+In the example above only one thread is currently running. If other threads
+exists in the current process they will be also listed here.
+
 ### Links
 
 - [Eventlet Documentation](https://eventlet.readthedocs.io/)
