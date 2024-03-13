@@ -265,6 +265,106 @@ tests/asyncio_test.py:235: CancelledError
 In the example above only one thread is currently running. If other threads
 exists in the current process they will be also listed here.
 
+### Debug Eventlet With eBPF and BCC
+
+Eventlet is based on [greenlet](https://greenlet.readthedocs.io/en/latest/history.html),
+so to see what happens under the hood of Eventlet, especially with greenthreads,
+we have to observe what greenlet is doing.
+
+Greenlets are provided as a C extension module for the regular unmodified interpreter.
+
+```shell
+$ ldd .tox/py312-asyncio/lib/python3.12/site-packages/greenlet/_greenlet.cpython-312-x86_64-linux-gnu.so
+        linux-vdso.so.1 (0x00007ffc2936a000)
+        libstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007f599ae00000)
+        libm.so.6 => /lib64/libm.so.6 (0x00007f599b10c000)
+        libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007f599b0e8000)
+        libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f599b0e3000)
+        libc.so.6 => /lib64/libc.so.6 (0x00007f599ac1e000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f599b224000)
+```
+
+```
+$ dumpelf .tox/py312-asyncio/lib/python3.12/site-packages/greenlet/_greenlet.cpython-312-x86_64-linux-gnu.so
+#include <elf.h>
+
+/*
+ * ELF dump of '.tox/py312-asyncio/lib/python3.12/site-packages/greenlet/_greenlet.cpython-312-x86_64-linux-gnu.so'
+ *     1514208 (0x171AE0) bytes
+ */
+
+Elf64_Dyn dumpedelf_dyn_0[];
+struct {
+        Elf64_Ehdr ehdr;
+        Elf64_Phdr phdrs[10];
+        Elf64_Shdr shdrs[38];
+        Elf64_Dyn *dyns;
+} dumpedelf_0 = {
+
+.ehdr = {
+        .e_ident = { /* (EI_NIDENT bytes) */
+                /* [0] EI_MAG:        */ 0x7F,'E','L','F',
+                /* [4] EI_CLASS:      */ 2 , /* (ELFCLASS64) */
+                /* [5] EI_DATA:       */ 1 , /* (ELFDATA2LSB) */
+                /* [6] EI_VERSION:    */ 1 , /* (EV_CURRENT) */
+                /* [7] EI_OSABI:      */ 0 , /* (ELFOSABI_NONE) */
+                /* [8] EI_ABIVERSION: */ 0 ,
+                /* [9-15] EI_PAD:     */ 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
+        },
+        .e_type      = 3          , /* (ET_DYN) */
+        .e_machine   = 62         , /* (EM_X86_64) */
+        .e_version   = 1          , /* (EV_CURRENT) */
+        .e_entry     = 0x0        , /* (start address at runtime) */
+        .e_phoff     = 64         , /* (bytes into file) */
+        .e_shoff     = 1511776    , /* (bytes into file) */
+        .e_flags     = 0x0        ,
+        .e_ehsize    = 64         , /* (bytes) */
+        .e_phentsize = 56         , /* (bytes) */
+        .e_phnum     = 10         , /* (program headers) */
+        .e_shentsize = 64         , /* (bytes) */
+        .e_shnum     = 38         , /* (section headers) */
+        .e_shstrndx  = 37        
+},
+
+.phdrs = {
+/* Program Header #0 0x40 */
+{
+        .p_type   = 1          , /* [PT_LOAD] */
+        .p_offset = 0          , /* (bytes into file) */
+        .p_vaddr  = 0x0        , /* (virtual addr at runtime) */
+        .p_paddr  = 0x0        , /* (physical addr at runtime) */
+        .p_filesz = 35112      , /* (bytes in file) */
+        .p_memsz  = 35112      , /* (bytes in mem at runtime) */
+        .p_flags  = 0x4        , /* PF_R */
+        .p_align  = 4096       , /* (min mem alignment in bytes) */
+},
+/* Program Header #1 0x78 */
+...
+```
+
+```shell
+$ nm .tox/py312-asyncio/lib/python3.12/site-packages/greenlet/_greenlet.cpython-312-x86_64-linux-gnu.so
+...
+                 U PyGC_Disable
+                 U PyGC_Enable
+                 U PyGC_IsEnabled
+0000000000012720 t PyGreenlet_GetCurrent
+000000000000b6f7 t PyGreenlet_GetCurrent.cold
+0000000000013590 t PyGreenlet_New
+000000000000bc1d t PyGreenlet_New.cold
+000000000000d980 t PyGreenlet_SetParent
+000000000000a056 t PyGreenlet_SetParent.cold
+000000000000f520 t PyGreenlet_Switch
+0000000000010560 t PyGreenlet_Throw
+000000000000ac6c t PyGreenlet_Throw.cold
+0000000000021c60 D PyGreenlet_Type
+0000000000021ac0 D PyGreenletUnswitchable_Type
+                 U PyImport_ImportModule
+000000000000fcb0 T PyInit__greenlet
+000000000000a447 t PyInit__greenlet.cold
+...
+```
+
 ### Links
 
 - [Eventlet Documentation](https://eventlet.readthedocs.io/)
