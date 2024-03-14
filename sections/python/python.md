@@ -193,3 +193,55 @@ Disassembly of section .fini:
   408738:	48 83 c4 08          	add    $0x8,%rsp
   40873c:	c3                   	retq   
 ```
+
+### USDT (User Statically-Defined Tracing (USDT) probes) & Python
+
+Imagine you ran a python server, and you want to monitor threads for this
+running python process.
+
+First, lets start this server:
+
+```
+$ python3 -m http.server
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+```
+
+
+You can use [bpftrace](https://github.com/bpftrace/bpftrace) to list all USDT
+available for this running python server:
+
+```
+$ sudo bpftrace -lp <pid> "usdt:*" 
+...
+usdt:/proc/920960/root/usr/lib64/libc.so.6:libc:mutex_timedlock_acquired
+usdt:/proc/920960/root/usr/lib64/libc.so.6:libc:mutex_timedlock_entry
+usdt:/proc/920960/root/usr/lib64/libc.so.6:libc:pthread_create
+usdt:/proc/920960/root/usr/lib64/libc.so.6:libc:pthread_join
+usdt:/proc/920960/root/usr/lib64/libc.so.6:libc:pthread_join_ret
+usdt:/proc/920960/root/usr/lib64/libc.so.6:libc:pthread_start
+usdt:/proc/920960/root/usr/lib64/libc.so.6:libc:rdlock_acquire_read
+usdt:/proc/920960/root/usr/lib64/libc.so.6:libc:rdlock_entry
+usdt:/proc/920960/root/usr/lib64/libc.so.6:libc:rwlock_destroy
+...
+```
+
+Replace `<pid>` the pid of the running python server that you want to inspect,
+you can retrieve this `pid` by using `ps ax | grep python`.
+
+The previous command list all the USDT you can attach.
+
+We want to observe threads, so lets focus on them:
+
+```
+$ sudo bpftrace -p <pid> -e \
+    'usdt:/proc/<pid>/root/usr/lib64/libc.so.6:libc:pthread* 
+    { printf("%s %u [%u] %u %s\n", comm, pid, cpu, elapsed, probe); }'
+Attaching 4 probes...
+python3 <pid> [3] 1546728119 usdt:/proc/921304/root/usr/lib64/libc.so.6:libc:pthread_create
+python3 <pid> [1] 1546799291 usdt:/proc/921304/root/usr/lib64/libc.so.6:libc:pthread_start
+```
+
+In the example above we can observe that a thread is created and started when
+I submit a new request to this running server (`wget http://0.0.0.0:8000/`).
+
+Lot of USDT endpoints can be monitored, that can be useful to debug your apps.

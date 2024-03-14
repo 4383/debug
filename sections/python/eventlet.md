@@ -271,8 +271,20 @@ Eventlet is based on [greenlet](https://greenlet.readthedocs.io/en/latest/histor
 so to see what happens under the hood of Eventlet, especially with greenthreads,
 we have to observe what greenlet is doing.
 
-Greenlets are provided as a C extension module for the regular unmodified interpreter.
+The Greenlet documentation says:
 
+> The “greenlet” package is a spin-off of Stackless, a version of CPython that
+  supports micro-threads called “tasklets”. Tasklets run pseudo-concurrently
+  (typically in a single or a few OS-level threads) and are synchronized with
+  data exchanges on “channels”.
+
+> Greenlets are provided as a C extension module for the regular unmodified
+  Python interpreter.
+
+In this case various elf tools can help us to observe specific parts of
+Greenlet. These will help us to implement our own bcc user-space probs.
+
+First what are the shared libraries used by Greenlet:
 ```shell
 $ ldd .tox/py312-asyncio/lib/python3.12/site-packages/greenlet/_greenlet.cpython-312-x86_64-linux-gnu.so
         linux-vdso.so.1 (0x00007ffc2936a000)
