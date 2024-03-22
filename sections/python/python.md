@@ -245,3 +245,37 @@ In the example above we can observe that a thread is created and started when
 I submit a new request to this running server (`wget http://0.0.0.0:8000/`).
 
 Lot of USDT endpoints can be monitored, that can be useful to debug your apps.
+
+## Using perf to profile python process
+
+If the [PYTHONPERFSUPPORT](https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPERFSUPPORT)
+variable is set to a nonzero value, it enables support for the Linux perf
+profiler so Python calls can be detected by it.
+
+```shell
+$ PYTHONPERFSUPPORT=1 python sample.py
+```
+
+Then we are now able to record the profile of our running python process
+by using the `perf record` command:
+
+```shell
+$ perf record -F 9999 -g -o perf.data -p $(ps ax | grep python | grep sample | awk '{print $1}')
+```
+
+Once our recording is finished we are now able to generate a report for
+our recorded profile:
+
+```shell
+$ perf report -g -i perf.data
+```
+
+Or, create a flamegraph from your app:
+
+```shell
+$ perf script flamegraph -a -F 99 sleep 60
+```
+
+More interesting details can be found there:
+- https://www.brendangregg.com/perf.html
+- https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/monitoring_and_managing_system_status_and_performance/getting-started-with-flamegraphs_monitoring-and-managing-system-status-and-performance

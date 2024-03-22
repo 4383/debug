@@ -11,3 +11,4 @@ This website present tips and tricks that I use on a daily basis.
     - [How to Debug Python](sections/python/python.md)
     - [How to Debug Eventlet](sections/python/eventlet.md)
 - [How to debug on Openstack](sections/openstack/README.md)
+- [How to debug network](sections/network.md)
