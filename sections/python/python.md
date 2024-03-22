@@ -279,3 +279,4 @@ $ perf script flamegraph -a -F 99 sleep 60
 More interesting details can be found there:
 - https://www.brendangregg.com/perf.html
 - https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/monitoring_and_managing_system_status_and_performance/getting-started-with-flamegraphs_monitoring-and-managing-system-status-and-performance
+- https://docs.python.org/3/howto/perf_profiling.html
