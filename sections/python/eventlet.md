@@ -1,3 +1,6 @@
+---
+description: Find ways to debug Eventlet and Python process using BCC, bpftrace, pdb, strace, and more
+---
 ## Eventlet debug resources
 
 ### Use tox as virtual env
