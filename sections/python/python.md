@@ -206,7 +206,6 @@ $ python3 -m http.server
 Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
 ```
 
-
 You can use [bpftrace](https://github.com/bpftrace/bpftrace) to list all USDT
 available for this running python server:
 
@@ -245,6 +244,109 @@ In the example above we can observe that a thread is created and started when
 I submit a new request to this running server (`wget http://0.0.0.0:8000/`).
 
 Lot of USDT endpoints can be monitored, that can be useful to debug your apps.
+
+## Using BCC to trace a pid launched in a Python virtual context
+
+Sometime we run python things inside a virtualenv,
+in this case shared object and listing available probes can differ from
+a raw launching.
+
+The snippet below is an example of this problem. The [deadlock](https://github.com/iovisor/bcc/blob/master/tools/deadlock.py)
+BCC tools is not able to properly find the `pthread_mutex_unlock` symbol,
+because of the virtualenv usage:
+
+```
+$ tox -e venv -- python reproducer.py
+$ ps ax | grep reproducer
+1535989 pts/2    Sl+    0:27 /usr/bin/python3 -P /usr/bin/tox -e venv -- python reproducer.py
+1536055 pts/2    Sl+    0:00 /home/hberaud/dev/oslo.log/.tox/venv/bin/python reproducer.py
+1536892 pts/3    S+     0:00 grep --color=auto --exclude-dir=.bzr --exclude-dir=CVS --exclude-dir=.git --exclude-dir=.hg --exclude-dir=.svn --exclude-dir=.idea --exclude-dir=.tox reprod
+$ sudo /usr/share/bcc/tools/deadlock 1536055
+In file included from /virtual/main.c:11:
+In file included from include/linux/sched.h:12:
+In file included from arch/x86/include/asm/current.h:10:
+In file included from include/linux/cache.h:6:
+In file included from arch/x86/include/asm/cache.h:5:
+In file included from include/linux/linkage.h:8:
+In file included from arch/x86/include/asm/linkage.h:6:
+arch/x86/include/asm/ibt.h:77:8: warning: 'nocf_check' attribute ignored; use -fcf-protection to enable the attribute [-Wignored-attributes]
+extern __noendbr u64 ibt_save(bool disable);
+       ^
+arch/x86/include/asm/ibt.h:32:34: note: expanded from macro '__noendbr'
+#define __noendbr       __attribute__((nocf_check))
+                                       ^
+arch/x86/include/asm/ibt.h:78:8: warning: 'nocf_check' attribute ignored; use -fcf-protection to enable the attribute [-Wignored-attributes]
+extern __noendbr void ibt_restore(u64 save);
+       ^
+arch/x86/include/asm/ibt.h:32:34: note: expanded from macro '__noendbr'
+#define __noendbr       __attribute__((nocf_check))
+                                       ^
+2 warnings generated.
+could not determine address of symbol pthread_mutex_unlock in /usr/bin/python3.12. Failed to attach to symbol: pthread_mutex_unlock
+Is --binary argument missing?
+```
+
+Starting from there, we can try to pass more arguments to this BCC tools
+to help it to find the thing it needs.
+Here is an example on how to retrieve such details in an virtual env context:
+
+```
+$ ldd /home/hberaud/dev/oslo.log/.tox/venv/bin/python
+        linux-vdso.so.1 (0x00007ffdc33ab000)
+        libpython3.12.so.1.0 => /lib64/libpython3.12.so.1.0 (0x00007fbdd7200000)
+        libc.so.6 => /lib64/libc.so.6 (0x00007fbdd701e000)
+        libm.so.6 => /lib64/libm.so.6 (0x00007fbdd6f3d000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007fbdd7905000)
+$ nm /lib64/ld-linux-x86-64.so.2 | grep mutex
+0000000000012da0 t rtld_mutex_dummy
+000000000001a610 t __rtld_mutex_init
+0000000000033a50 d ___rtld_mutex_lock
+0000000000033a48 d ___rtld_mutex_unlock
+nm /lib64/libc.so.6 | grep mutex | grep unlock
+00000000000937b0 t __GI___pthread_mutex_unlock
+0000000000093690 t __GI___pthread_mutex_unlock_usercnt
+00000000000937b0 t ___pthread_mutex_unlock
+0000000000093230 t __pthread_mutex_unlock_full
+00000000000937b0 T __pthread_mutex_unlock@GLIBC_2.2.5
+00000000000937b0 T pthread_mutex_unlock@@GLIBC_2.2.5
+0000000000093690 t __pthread_mutex_unlock_usercnt
+```
+
+First we inspect the shared objects used by the binary used by our virtualenv.
+Then, we search for such mutex unlock features. The `/lib64/libc.so.6` seems
+to own something that is very close to the symbol that the deadlock tools
+try to trace.
+
+Lets see if we can use it.
+
+```
+$ sudo /usr/share/bcc/tools/deadlock 1536055 --binary /lib64/libc.so.6
+In file included from /virtual/main.c:11:
+In file included from include/linux/sched.h:12:
+In file included from arch/x86/include/asm/current.h:10:
+In file included from include/linux/cache.h:6:
+In file included from arch/x86/include/asm/cache.h:5:
+In file included from include/linux/linkage.h:8:
+In file included from arch/x86/include/asm/linkage.h:6:
+arch/x86/include/asm/ibt.h:77:8: warning: 'nocf_check' attribute ignored; use -fcf-protection to enable the attribute [-Wignored-attributes]
+extern __noendbr u64 ibt_save(bool disable);
+       ^
+arch/x86/include/asm/ibt.h:32:34: note: expanded from macro '__noendbr'
+#define __noendbr       __attribute__((nocf_check))
+                                       ^
+arch/x86/include/asm/ibt.h:78:8: warning: 'nocf_check' attribute ignored; use -fcf-protection to enable the attribute [-Wignored-attributes]
+extern __noendbr void ibt_restore(u64 save);
+       ^
+arch/x86/include/asm/ibt.h:32:34: note: expanded from macro '__noendbr'
+#define __noendbr       __attribute__((nocf_check))
+                                       ^
+2 warnings generated.
+Tracing... Hit Ctrl-C to end.
+```
+
+Bingo! By passing the binary path to the deadlock BCC tool, this tracer now
+works now as expected. We are now able to detect potential deadlocks in
+our Python process.
 
 ## Using perf to profile python process
 
