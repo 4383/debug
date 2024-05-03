@@ -1,3 +1,6 @@
+---
+description: Find ways to debug RabbitMQ and oslo.messaging based clients
+---
 ## RabbitMQ debug resources
 
 ### AMQP frame structure
