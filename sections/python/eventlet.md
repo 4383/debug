@@ -383,3 +383,4 @@ $ nm .tox/py312-asyncio/lib/python3.12/site-packages/greenlet/_greenlet.cpython-
 ### Links
 
 - [Eventlet Documentation](https://eventlet.readthedocs.io/)
+- [How to Debug Python](python.html)
