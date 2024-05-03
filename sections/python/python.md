@@ -1,3 +1,6 @@
+---
+description: Find ways to debug Python using BCC, bpftrace, pdb
+---
 ## Python Debug Resources
 
 In the following examples I refer to one of my code snippets
